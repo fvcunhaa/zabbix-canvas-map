@@ -1,11 +1,10 @@
 <?php
-$page = (new CHtmlPage())
+$canvas_root = (new CDiv())
+    ->setId('zcm-root')
+    ->setAttribute('data-version', $data['module_version'])
+    ->setAttribute('data-csrf', \CCsrfTokenHelper::get('canvas.store'));
+
+(new CHtmlPage())
     ->setTitle($data['page_title'])
-    ->addItem(new CDiv([
-        new CTag('div', true, '', [
-            'id' => 'zcm-root',
-            'data-version' => $data['module_version'],
-            'data-csrf' => \CCsrfTokenHelper::get('canvas.store')
-        ])
-    ]));
-$page->show();
+    ->addItem($canvas_root)
+    ->show();
