@@ -317,7 +317,7 @@ document.addEventListener('pointermove',e=>{if(!drag)return;let dx=(e.clientX-dr
 stage.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();scale=Math.max(.3,Math.min(2.5,scale*(e.deltaY>0?.9:1.1)));transform()},{passive:false});
 document.addEventListener('keydown',e=>{if(!root.isConnected)return;let focused=document.activeElement;if(focused&&(focused.tagName==='INPUT'||focused.tagName==='TEXTAREA'))return;if(e.code==='Space')space=true;if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();action(e.shiftKey?'redo':'undo')}if((e.key==='Delete'||e.key==='Backspace')&&selected){e.preventDefault();action('delete')}});document.addEventListener('keyup',e=>{if(e.code==='Space')space=false});
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
-restore();library.main ||= JSON.parse(serialize());render();refreshStates();bootstrapRemote();refreshTimer=setInterval(()=>{if(root.isConnected)refreshStates();else clearInterval(refreshTimer)},30000);
+restore();applyBackground();library.main ||= JSON.parse(serialize());render();refreshStates();bootstrapRemote();refreshTimer=setInterval(()=>{if(root.isConnected)refreshStates();else clearInterval(refreshTimer)},30000);
 };
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', zcmBoot, { once: true });
