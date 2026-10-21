@@ -1,0 +1,12 @@
+# Merge into your existing Zabbix Web service; do not create a new PostgreSQL container.
+# Configure environment in the Zabbix Web container; share values across all web replicas.
+services:
+  zabbix-web:
+    environment:
+      ZCM_DB_HOST: postgres
+      ZCM_DB_PORT: '5432'
+      ZCM_DB_NAME: canvas_map
+      ZCM_DB_USER: canvas_map_app
+      ZCM_DB_PASSWORD: ${ZCM_DB_PASSWORD:?Configure secure password}
+    volumes:
+      - ./module:/usr/share/zabbix/modules/zabbix-canvas-map:ro
