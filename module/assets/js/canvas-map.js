@@ -1,4 +1,4 @@
-(() => {
+const zcmBoot = () => {
 'use strict';
 const root=document.getElementById('zcm-root');if(!root)return;
 const KEY='zcm:v0.2:map';const LIBKEY='zcm:v0.6:maps';let revisions={};let mapId='main';let mapName='Mapa principal';let library={};const apiEndpoint='zabbix.php?action=canvas.data';let states={},latest=0,refreshTimer=null;let selected=null,selectedEdge=null,drag=null,dirty=false,connectFrom=null;
@@ -185,4 +185,9 @@ stage.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();scale
 document.addEventListener('keydown',e=>{if(!root.isConnected)return;let focused=document.activeElement;if(focused&&(focused.tagName==='INPUT'||focused.tagName==='TEXTAREA'))return;if(e.code==='Space')space=true;if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();action(e.shiftKey?'redo':'undo')}if((e.key==='Delete'||e.key==='Backspace')&&selected){e.preventDefault();action('delete')}});document.addEventListener('keyup',e=>{if(e.code==='Space')space=false});
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
 restore();library.main ||= JSON.parse(serialize());render();refreshStates();bootstrapRemote();refreshTimer=setInterval(()=>{if(root.isConnected)refreshStates();else clearInterval(refreshTimer)},30000);
-})();
+};
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', zcmBoot, { once: true });
+} else {
+  zcmBoot();
+}
