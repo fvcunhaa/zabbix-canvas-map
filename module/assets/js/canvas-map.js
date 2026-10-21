@@ -29,8 +29,16 @@ async function store(op,id,doc){
  const response=await fetch('zabbix.php?action=canvas.store&csrf_token='+encodeURIComponent(token),{
   method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/x-www-form-urlencoded'},body
  });
- if(!response.ok)throw Error('HTTP '+response.status);
- const result=await response.json();if(result.error)throw Error(result.error);
+ const raw=await response.text();
+ let result;
+ try { result=JSON.parse(raw); }
+ catch (_) {
+   const isHtml=/^\\s*<(?:!doctype|html|div|body|head)/i.test(raw);
+   throw Error('Endpoint canvas.store retornou '+(isHtml?'HTML':'conteúdo não-JSON')+
+     ' (HTTP '+response.status+'). Verifique permissão da action, CSRF e resposta do PHP-FPM.');
+ }
+ if(!response.ok)throw Error(result.error || ('HTTP '+response.status));
+ if(result.error)throw Error(result.error);
  return result;
 }
 async function saveRemote(){
