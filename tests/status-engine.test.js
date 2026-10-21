@@ -1,0 +1,10 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert/strict');
+const e=require('../module/assets/js/status-engine.js');
+test('empty and unknown statuses are not OK',()=>{assert.equal(e.maximum([]),'unknown');assert.equal(e.maximum(['ok','unknown']),'unknown');assert.equal(e.maximum(['critical','unknown']),'critical')});
+test('worst severity aggregation',()=>{assert.equal(e.aggregate(['ok','warning']),'warning');assert.equal(e.aggregate(['warning','critical']),'critical')});
+test('all, count and percent rules',()=>{assert.equal(e.aggregate(['critical','ok'],{mode:'all'}),'warning');assert.equal(e.aggregate(['critical','critical'],{mode:'all'}),'critical');assert.equal(e.aggregate(['critical','ok'],{mode:'count',criticalCount:2}),'warning');assert.equal(e.aggregate(['critical','ok'],{mode:'percent',criticalPercent:50}),'critical')});
+test('invalid thresholds never turn shape OK',()=>{assert.equal(e.aggregate(['ok'],{mode:'percent',criticalPercent:101}),'unknown');assert.equal(e.aggregate(['critical'],{mode:'count',criticalCount:0}),'unknown')});
+test('propagation follows upstream only, bounded cycles',()=>{const relations=[{from:'app',to:'srv'},{from:'srv',to:'db'},{from:'db',to:'app'}];const r=e.propagate('app',relations,{db:[{eventid:'7',name:'DB down',severity:5}]});assert.equal(r.impact,true);assert.equal(r.causes.length,1);assert.equal(e.propagate('db',relations,{srv:[{eventid:'3',severity:4}]}).impact,true)});
+test('unresolved dependency does not assert a cause',()=>{const r=e.propagate('app',[{from:'app',targetName:'nohost',missing:true}],{});assert.equal(r.impact,false);assert.equal(r.missing,true)});
+test('impact severity and rule override',()=>{const impact={impact:true,causes:[{severity:5}]};assert.equal(e.applyImpact('ok',impact,{}).status,'critical');assert.equal(e.applyImpact('ok',impact,{mode:'own'}).status,'ok');assert.equal(e.applyImpact('warning',impact,{mode:'inherited'}).status,'critical')});
