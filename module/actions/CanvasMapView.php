@@ -12,7 +12,7 @@ class CanvasMapView extends CController {
     protected function checkPermissions(): bool {
         // Zabbix has already authenticated the request; later phases add
         // per-map authorization and explicit role checks.
-        return (int)\CWebUser::$data['type'] >= 1;
+        return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
     }
 
     protected function doAction(): void {
