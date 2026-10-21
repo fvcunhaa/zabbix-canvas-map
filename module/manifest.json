@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2.0,
+  "id": "zabbix-canvas-map",
+  "name": "Zabbix Canvas Map",
+  "namespace": "ZabbixCanvasMap",
+  "version": "0.13.0",
+  "author": "Zabbix Canvas Map Contributors",
+  "description": "Canvas Map com persistência em banco PostgreSQL canvas_map dedicado, sem alteração do banco zabbix",
+  "actions": {
+    "canvas.map": {"class": "CanvasMapView", "view": "canvas.map"},
+    "canvas.data": {"class": "CanvasData"},
+    "canvas.store": {"class": "CanvasStore"}
+  },
+  "assets": {"css": ["canvas-map.css"], "js": ["status-engine.js", "canvas-map.js"]}
+}
