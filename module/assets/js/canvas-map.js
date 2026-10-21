@@ -26,7 +26,7 @@ async function store(op,id,doc){
  if(!token)throw Error('Token CSRF não disponível');
  const body=new URLSearchParams({op,map_id:id||'',revision:String(revisions[id]||0)});
  if(doc)body.set('document',JSON.stringify(doc));
- const response=await fetch('zabbix.php?action=canvas.store&csrf_token='+encodeURIComponent(token),{
+ const response=await fetch('zabbix.php?action=canvas.store&_csrf_token='+encodeURIComponent(token),{
   method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/x-www-form-urlencoded'},body
  });
  const raw=await response.text();
