@@ -5,6 +5,11 @@ use CController;
 use CControllerResponseData;
 
 class CanvasMapView extends CController {
+    public function init(): void {
+        // Read-only page opened by GET: no CSRF token is expected in the URL.
+        $this->disableCsrfValidation();
+    }
+
     protected function checkInput(): bool {
         return true;
     }
