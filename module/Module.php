@@ -8,6 +8,10 @@ use CMenuItem;
 class Module extends CModule {
     public function init(): void {
         APP::Component()->get('menu.main')
-            ->add((new CMenuItem(_('Canvas Map')))->setAction('canvas.map'));
+            ->findOrAdd(_('Monitoring'))
+            ->getSubmenu()
+            ->insertAfter(_('Discovery'),
+                (new CMenuItem(_('Canvas Map')))->setAction('canvas.map')
+            );
     }
 }
