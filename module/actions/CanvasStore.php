@@ -13,7 +13,7 @@ class CanvasStore extends CController {
         ]);
     }
     protected function checkPermissions(): bool {
-        return (int)\CWebUser::$data['type'] >= 2;
+        return (int)\CWebUser::$data['type'] >= 1;
     }
     private static function db(): \PDO {
         if (!extension_loaded('pdo_pgsql')) {
