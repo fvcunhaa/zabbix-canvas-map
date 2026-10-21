@@ -58,3 +58,46 @@
   #zcm-root .zcm-layout > .zcm-panel { max-height:none; }
   #zcm-root .zcm-stage { height:460px; min-height:380px; }
 }
+
+
+/* Adaptive workspace: collapsible and draggable side panels. */
+#zcm-root .zcm-workspace-controls{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+#zcm-root .zcm-workspace-controls button{white-space:nowrap;padding:7px 9px}
+#zcm-root .zcm-workspace-controls button[aria-pressed="false"]{opacity:.64}
+#zcm-root .zcm-layout{
+  position:relative;
+  grid-template-columns:minmax(0,var(--zcm-left-width,228px)) minmax(0,1fr) minmax(0,var(--zcm-right-width,290px)) !important;
+  min-width:0;
+}
+#zcm-root .zcm-layout.zcm-left-closed{grid-template-columns:minmax(0,1fr) minmax(0,var(--zcm-right-width,290px)) !important}
+#zcm-root .zcm-layout.zcm-right-closed{grid-template-columns:minmax(0,var(--zcm-left-width,228px)) minmax(0,1fr) !important}
+#zcm-root .zcm-layout.zcm-left-closed.zcm-right-closed{grid-template-columns:minmax(0,1fr) !important}
+#zcm-root .zcm-layout.zcm-left-closed>.zcm-panel:not(.zcm-props),
+#zcm-root .zcm-layout.zcm-right-closed>.zcm-props{display:none !important}
+#zcm-root .zcm-layout>.zcm-stage-wrap{grid-column:auto !important;min-width:0;min-height:0}
+#zcm-root .zcm-layout>.zcm-panel{overflow-x:hidden;overscroll-behavior:contain}
+#zcm-root .zcm-split-handle{position:absolute;top:0;bottom:0;width:9px;z-index:8;cursor:col-resize;touch-action:none;transform:translateX(-50%);background:transparent}
+#zcm-root .zcm-split-handle::after{content:"";position:absolute;top:35%;bottom:35%;left:3px;width:3px;border-radius:3px;background:#6082a5;opacity:.35}
+#zcm-root .zcm-split-handle:hover::after{opacity:1;background:#59baff}
+#zcm-root .zcm-split-left{left:var(--zcm-left-width,228px)}
+#zcm-root .zcm-split-right{right:var(--zcm-right-width,290px);transform:translateX(50%)}
+#zcm-root .zcm-layout.zcm-left-closed>.zcm-split-left,
+#zcm-root .zcm-layout.zcm-right-closed>.zcm-split-right{display:none}
+#zcm-root .zcm-layout>.zcm-panel h3{position:sticky;top:0;z-index:1;background:#1a2a3e;padding:7px 0}
+#zcm-root .zcm-layout .zcm-props input,
+#zcm-root .zcm-layout .zcm-props select{min-width:0;max-width:100%}
+@media(max-width:1100px){
+ #zcm-root .zcm-layout:not(.zcm-left-closed):not(.zcm-right-closed){grid-template-columns:minmax(190px,var(--zcm-left-width,228px)) minmax(0,1fr) !important}
+ #zcm-root .zcm-layout:not(.zcm-left-closed):not(.zcm-right-closed)>.zcm-props{grid-column:1/-1 !important;max-height:420px;overflow:auto}
+ #zcm-root .zcm-layout.zcm-left-closed>.zcm-props{grid-column:auto !important}
+ #zcm-root .zcm-split-handle{display:none}
+}
+@media(max-width:680px){
+ #zcm-root .zcm-layout,
+ #zcm-root .zcm-layout.zcm-left-closed,
+ #zcm-root .zcm-layout.zcm-right-closed,
+ #zcm-root .zcm-layout.zcm-left-closed.zcm-right-closed{display:flex !important;flex-direction:column;min-height:0}
+ #zcm-root .zcm-layout>.zcm-panel{width:100% !important;max-height:260px;overflow:auto}
+ #zcm-root .zcm-layout>.zcm-stage-wrap{order:-1}
+ #zcm-root .zcm-stage{height:58vh;min-height:360px}
+}
