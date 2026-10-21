@@ -101,3 +101,24 @@
  #zcm-root .zcm-layout>.zcm-stage-wrap{order:-1}
  #zcm-root .zcm-stage{height:58vh;min-height:360px}
 }
+
+
+/* Compact collapsible sidebar toolbox */
+#zcm-root .zcm-toolbar{align-items:center;gap:7px}
+#zcm-root .zcm-toolbar .zcm-workspace-controls{flex:0 0 auto}
+#zcm-root .zcm-layout>.zcm-panel:not(.zcm-props){padding:8px;gap:6px}
+#zcm-root .zcm-tool-group{border:1px solid #355575;border-radius:9px;min-width:0;background:#1a2d43;overflow:hidden}
+#zcm-root .zcm-tool-group>summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;padding:12px 11px;font-size:12px;font-weight:700;letter-spacing:.025em;color:#e7f3ff;background:#213950;user-select:none}
+#zcm-root .zcm-tool-group>summary::-webkit-details-marker{display:none}
+#zcm-root .zcm-tool-group>summary::after{content:'▸';font-size:13px;color:#a6bdd5}
+#zcm-root .zcm-tool-group[open]>summary::after{content:'▾'}
+#zcm-root .zcm-tool-group-body{display:flex;flex-direction:column;gap:8px;padding:10px}
+#zcm-root .zcm-tool-group-body>.zcm-divider{margin:3px 0}
+#zcm-root .zcm-tool-group-body>button{display:flex;align-items:center;min-height:35px;white-space:normal;line-height:1.2;padding:8px 10px}
+#zcm-root .zcm-tool-group-body p{margin:0 0 4px;overflow-wrap:anywhere}
+#zcm-root .zcm-tool-group-body label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:#cbdcec}
+#zcm-root .zcm-tool-group-body input,#zcm-root .zcm-tool-group-body select{box-sizing:border-box;max-width:100%;width:100%;min-width:0;border-radius:6px;padding:8px;background:#112438;border:1px solid #476783;color:#fff}
+#zcm-root .zcm-tool-group-body input[type=color]{height:36px;padding:3px}
+#zcm-root .zcm-tool-group-body input[type=file]{font-size:11px}
+#zcm-root .zcm-tool-group-body input[type=range]{padding:0;accent-color:#45a9ef}
+#zcm-root .zcm-background-group .zcm-help{font-size:11px}
