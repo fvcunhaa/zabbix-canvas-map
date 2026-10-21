@@ -1,0 +1,10 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const e=require('../module/assets/js/status-engine.js');
+const maps={main:{nodes:[{id:'process',action:'map',targetMap:'services',statusRule:{source:'children'}}]},services:{nodes:[{id:'app',action:'map',targetMap:'infra',statusRule:{source:'children'}}]},infra:{nodes:[{id:'srv'}]}};
+test('critical device propagates across three maps',()=>{let r=e.hierarchy(maps,'main',{infra:{srv:{status:'critical'}}});assert.equal(r.result.status,'critical');assert.equal(r.maps.services.status,'critical')});
+test('unknown is not mapped to healthy',()=>assert.equal(e.hierarchy(maps,'main',{}).result.status,'unknown'));
+test('missing child remains unknown',()=>assert.equal(e.hierarchy({main:{nodes:[{id:'a',action:'map',targetMap:'missing',statusRule:{source:'children'}}]}},'main').result.status,'unknown'));
+test('cyclic references are bounded',()=>{const cyclic={main:{nodes:[{id:'a',action:'map',targetMap:'other',statusRule:{source:'children'}}]},other:{nodes:[{id:'b',action:'map',targetMap:'main',statusRule:{source:'children'}}]}};assert.equal(e.hierarchy(cyclic,'main').result.status,'unknown')});
+test('combined aggregates own and child',()=>{const docs={...maps,main:{nodes:[{id:'process',action:'map',targetMap:'services',statusRule:{source:'combined'}}]}};assert.equal(e.hierarchy(docs,'main',{main:{process:{status:'critical'}},infra:{srv:{status:'ok'}}}).result.status,'critical')});
+test('excluded nodes do not affect parent status',()=>{const docs={main:{nodes:[{id:'a',statusRule:{includeInMap:false}},{id:'b'}]}};assert.equal(e.hierarchy(docs,'main',{main:{a:{status:'critical'},b:{status:'ok'}}}).result.status,'ok')});
