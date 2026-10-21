@@ -10,9 +10,9 @@ class CanvasMapView extends CController {
     }
 
     protected function checkPermissions(): bool {
-        // Zabbix has already authenticated the request; later phases add
-        // per-map authorization and explicit role checks.
-        return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
+        // Access to the module is enforced by Zabbix User roles.
+        // The canvas page itself is available to all authenticated user types.
+        return true;
     }
 
     protected function doAction(): void {
