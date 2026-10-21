@@ -9,6 +9,68 @@ function snapshot(){history.push(serialize());if(history.length>40)history.shift
 function restore(){try{library=JSON.parse(localStorage.getItem(LIBKEY)||'{}')||{};const current=library.main||JSON.parse(localStorage.getItem(KEY)||'null');let p=current;if([1,2,3].includes(p?.schema)&&Array.isArray(p.nodes)){nodes=p.nodes.filter(n=>n&&typeof n.id==='string').slice(0,300);edges=validateEdges(p.edges||[],nodes)}}catch(e){console.warn('Canvas Map: dados locais inválidos',e)}if(!nodes.length){nodes=[make('rect',120,100),make('circle',390,130),make('text',150,310)];nodes[0].text='Processo de negócio';nodes[1].text='Sistema / Serviço';nodes[2].text='Duplo clique para editar texto';}}
 const safe=s=>String(s??'');
 root.innerHTML=`<section class="zcm-app"><header class="zcm-toolbar"><strong>▦ Zabbix Canvas Map</strong><span class="zcm-muted">Editor visual · v0.13.0 preview · Homologação pendente</span><span class="zcm-spacer"></span><button data-act="undo" title="Desfazer">↶</button><button data-act="redo" title="Refazer">↷</button><button data-act="save" class="zcm-primary">Salvar Canvas</button><button data-act="refresh" title="Atualizar estados">↻ Atualizar</button><button data-act="maps" title="Administrar mapas">▤ Mapas</button><button data-act="preview" title="Visualizar mapa">▶ Visualizar</button><button data-act="dependencies" title="Analisar dependências dos hosts vinculados">⤴ Dependências</button><button data-act="export">Exportar JSON</button><label class="zcm-upload">Importar JSON<input id="zcm-import" type="file" accept="application/json,.json" hidden></label></header><div class="zcm-layout"><div class="zcm-panel"><h3>Elementos</h3><p class="zcm-help">Clique para adicionar. Arraste para mover e use a alça azul para redimensionar.</p><button data-add="rect">▭ Retângulo</button><button data-add="round">▢ Retângulo arredondado</button><button data-add="circle">◯ Círculo</button><button data-add="diamond">◇ Losango</button><button data-add="text">T Caixa de texto</button><div class="zcm-divider"></div><h3>Conectores</h3><p class="zcm-help">Clique em Conectar, depois escolha o shape de origem e o de destino.</p><button data-act="connect" id="zcm-connect">↗ Conectar shapes</button><button data-act="cancel-connect">Cancelar conexão</button><div class="zcm-divider"></div><button data-act="duplicate">Duplicar selecionado</button><button data-act="delete">Excluir selecionado</button><div class="zcm-divider"></div><h3>Navegação</h3><p class="zcm-help">Roda do mouse para rolar. Ctrl + roda para zoom. Mantenha espaço pressionado e arraste o fundo para navegar.</p><button data-act="zoom-out">− Zoom</button><button data-act="zoom-in">+ Zoom</button><button data-act="reset-view">Ajustar vista</button></div><div class="zcm-stage-wrap"><div id="zcm-stage" class="zcm-stage"><div id="zcm-world" class="zcm-world"><svg id="zcm-svg" xmlns="http://www.w3.org/2000/svg" width="2400" height="1600" viewBox="0 0 2400 1600"></svg></div></div><div class="zcm-status"><span id="zcm-message">Editor carregado · sincronização com canvas_map</span><span id="zcm-scale"></span></div></div><div class="zcm-panel zcm-props"><h3>Propriedades</h3><p id="zcm-none" class="zcm-help">Selecione um elemento para editar.</p><div id="zcm-edge-fields" hidden><label>Tipo<select data-edge="kind"><option value="bezier">Curva</option><option value="straight">Reta</option><option value="orthogonal">Ortogonal</option></select></label><label>Estilo<select data-edge="pattern"><option value="solid">Sólida</option><option value="dashed">Tracejada</option><option value="dotted">Pontilhada</option></select></label><label>Animação<select data-edge="animation"><option value="none">Nenhuma</option><option value="flow">Fluxo</option><option value="pulse">Pulsar</option></select></label><label>Seta<select data-edge="arrow"><option value="end">Destino</option><option value="both">Ambas as pontas</option><option value="none">Sem seta</option></select></label><label>Cor<input data-edge="stroke" type="color"></label><label>Espessura<input data-edge="width" type="number" min="1" max="12"></label><label>Rótulo<input data-edge="label" maxlength="80"></label><label>Ação ao clicar<select data-edge="action"><option value="none">Somente selecionar</option><option value="detail">Exibir detalhes</option></select></label><p class="zcm-help">A ação de detalhes é uma prévia local; eventos Zabbix estarão disponíveis nas próximas fases.</p></div><div id="zcm-fields" hidden><h3>Navegação</h3><label>Ação ao clicar<select data-nav="action"><option value="none">Nenhuma</option><option value="map">Abrir mapa filho</option><option value="problems">Problemas do shape</option></select></label><label>ID do mapa filho<input data-nav="targetMap" placeholder="Ex.: cctv"></label><p class="zcm-help">Use o botão Mapas para criar e selecionar mapas filhos.</p><div class="zcm-divider"></div><h3>Monitoramento Zabbix</h3><label>Origem de status<select data-bind="type"><option value="none">Não monitorado</option><option value="host">Host</option><option value="group">Grupo de hosts</option><option value="tag">Tag de host</option></select></label><label>Pesquisar hosts/grupos<input id="zcm-search" placeholder="Digite 2+ caracteres"></label><div id="zcm-search-results" class="zcm-search-results"></div><label>ID selecionado<input data-bind="id" readonly></label><label>Tag (nome)<input data-bind="tag" maxlength="128" placeholder="service"></label><label>Valor da tag<input data-bind="value" maxlength="128" placeholder="CCTV"></label><label>Severidade para atenção<select data-bind="warning"><option value="0">Not classified</option><option value="1">Information</option><option value="2">Warning</option><option value="3">Average</option><option value="4">High</option><option value="5">Disaster</option></select></label><label>Severidade para crítico<select data-bind="critical"><option value="0">Not classified</option><option value="1">Information</option><option value="2">Warning</option><option value="3">Average</option><option value="4">High</option><option value="5">Disaster</option></select></label><div class="zcm-divider"></div><h3>Regras de status</h3><label>Origem do status<select data-rule="source"><option value="own">Status próprio</option><option value="children">Mapa filho</option><option value="combined">Pior entre próprio e filho</option></select></label><label>Propagação de dependência<select data-rule="mode"><option value="own">Não herdar</option><option value="combined">Próprio + dependências</option><option value="inherited">Somente dependências quando houver impacto</option></select></label><label>Severidade mínima de impacto<select data-rule="criticalSeverity"><option value="2">Warning</option><option value="3">Average</option><option value="4">High</option><option value="5">Disaster</option></select></label><label><input type="checkbox" data-rule="includeInMap"> Participar da agregação do mapa</label><p id="zcm-node-status" class="zcm-help">Sem vínculo</p><div class="zcm-divider"></div><label>Texto<textarea data-field="text" rows="4"></textarea></label><div class="zcm-two"><label>X<input data-field="x" type="number"></label><label>Y<input data-field="y" type="number"></label><label>Largura<input data-field="w" min="36" type="number"></label><label>Altura<input data-field="h" min="30" type="number"></label></div><div class="zcm-two"><label>Fundo<input data-field="fill" type="color"></label><label>Borda<input data-field="stroke" type="color"></label><label>Texto<input data-field="color" type="color"></label><label>Fonte<input data-field="font" min="8" max="80" type="number"></label></div><label>Imagem no shape<input id="zcm-image" type="file" accept="image/png,image/jpeg,image/webp"></label><button data-act="remove-image">Remover imagem</button><p class="zcm-help">A imagem fica incorporada ao mapa exportado. Limite recomendado: 1 MB.</p></div></div></div><input id="zcm-text-input" class="zcm-inline-editor" hidden><div class="zcm-note">Fases 4–5: mapas com popup e análise de dependências. Persistência centralizada disponível após provisionar canvas_map; atualizações a cada 30 segundos.</div></section>`;
+// Collapsible, independently resizable tool panels. Persist only harmless UI preferences.
+const layout=root.querySelector('.zcm-layout');
+const leftPanel=layout?.querySelector('.zcm-panel:not(.zcm-props)');
+const rightPanel=layout?.querySelector('.zcm-props');
+if(layout&&leftPanel&&rightPanel){
+ const prefKey='zcm:workspace-layout:v1';
+ let pref={left:true,right:true,leftWidth:228,rightWidth:290};
+ try {const stored=JSON.parse(localStorage.getItem(prefKey)||'null');if(stored&&typeof stored==='object')pref={...pref,...stored};}catch(_){}
+ const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
+ pref.leftWidth=clamp(Number(pref.leftWidth)||228,190,430);
+ pref.rightWidth=clamp(Number(pref.rightWidth)||290,230,500);
+ const savePref=()=>{try{localStorage.setItem(prefKey,JSON.stringify(pref));}catch(_){}};
+ const controls=document.createElement('div');
+ controls.className='zcm-workspace-controls';
+ controls.innerHTML='<button type="button" data-zcm-toggle="left" aria-label="Alternar painel de elementos">☰ Elementos</button><button type="button" data-zcm-toggle="right" aria-label="Alternar painel de propriedades">⚙ Propriedades</button><button type="button" data-zcm-toggle="focus" aria-label="Foco no canvas">⛶ Foco no mapa</button>';
+ root.querySelector('.zcm-toolbar')?.prepend(controls);
+ const leftHandle=document.createElement('div'),rightHandle=document.createElement('div');
+ leftHandle.className='zcm-split-handle zcm-split-left';
+ rightHandle.className='zcm-split-handle zcm-split-right';
+ layout.append(leftHandle,rightHandle);
+ let focus=false;
+ function apply(){
+   layout.classList.toggle('zcm-left-closed',!pref.left);
+   layout.classList.toggle('zcm-right-closed',!pref.right);
+   layout.style.setProperty('--zcm-left-width',pref.leftWidth+'px');
+   layout.style.setProperty('--zcm-right-width',pref.rightWidth+'px');
+   for(const b of controls.querySelectorAll('[data-zcm-toggle]')){
+     const x=b.dataset.zcmToggle;
+     const expanded=x==='left'?pref.left:x==='right'?pref.right:focus;
+     b.setAttribute('aria-pressed',String(expanded));
+   }
+   savePref();
+ }
+ controls.addEventListener('click',e=>{
+   const btn=e.target.closest('[data-zcm-toggle]');if(!btn)return;
+   if(btn.dataset.zcmToggle==='left') {pref.left=!pref.left;focus=false;}
+   if(btn.dataset.zcmToggle==='right') {pref.right=!pref.right;focus=false;}
+   if(btn.dataset.zcmToggle==='focus'){
+     focus=!(focus&& !pref.left&&!pref.right);
+     pref.left=!focus;pref.right=!focus;
+   }
+   apply();
+ });
+ for(const [handle,side] of [[leftHandle,'left'],[rightHandle,'right']]){
+   handle.addEventListener('pointerdown',e=>{
+     if(e.button!==0)return;
+     e.preventDefault();
+     const start=e.clientX,initial=side==='left'?pref.leftWidth:pref.rightWidth;
+     handle.setPointerCapture(e.pointerId);
+     const move=ev=>{
+       const delta=(ev.clientX-start)*(side==='left'?1:-1);
+       pref[side+'Width']=clamp(initial+delta,side==='left'?190:230,side==='left'?430:500);
+       apply();
+     };
+     const stop=()=>{handle.removeEventListener('pointermove',move);handle.removeEventListener('pointerup',stop);handle.removeEventListener('pointercancel',stop);};
+     handle.addEventListener('pointermove',move);
+     handle.addEventListener('pointerup',stop);
+     handle.addEventListener('pointercancel',stop);
+   });
+ }
+ apply();
+}
 const edgeFields=root.querySelector('#zcm-edge-fields');const svg=root.querySelector('#zcm-svg'),world=root.querySelector('#zcm-world'),stage=root.querySelector('#zcm-stage'),fields=root.querySelector('#zcm-fields');let scale=1,offset={x:0,y:0},space=false;
 function esc(s){return safe(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function validateEdges(list,available){const valid=new Set(available.map(n=>n.id));return Array.isArray(list)?list.filter(e=>e&&typeof e.id==='string'&&valid.has(e.source)&&valid.has(e.target)&&e.source!==e.target).slice(0,600).map(e=>({...edgeMake(e.source,e.target),...e,kind:['bezier','straight','orthogonal'].includes(e.kind)?e.kind:'bezier',pattern:['solid','dashed','dotted'].includes(e.pattern)?e.pattern:'solid',animation:['none','flow','pulse'].includes(e.animation)?e.animation:'none',arrow:['none','end','both'].includes(e.arrow)?e.arrow:'end',action:['none','detail'].includes(e.action)?e.action:'none',stroke:/^#[0-9a-f]{6}$/i.test(e.stroke)?e.stroke:'#67c8ff',width:Math.max(1,Math.min(12,Number(e.width)||3)),label:safe(e.label).slice(0,80)})):[]}
